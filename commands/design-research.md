@@ -110,7 +110,7 @@ Don't push for completeness. Some things get figured out during planning or desi
 When the conversation reaches a natural stopping point, save the output:
 
 ```
-mkdir -p .design-foundations/research
+mkdir .design-foundations\research 2>nul
 ```
 
 File: `.design-foundations/research/YYYY-MM-DD-<project-slug>.md`
@@ -154,12 +154,12 @@ Stop when two consecutive questions change nothing.
 You wrote the doc with the whole conversation in your head, so you can't see where it leans on context that isn't on the page. Dispatch a fresh subagent that has none of it — no conversation summary, no intent framing; the file path is the entire briefing:
 
 ```
-Agent tool:
+Task tool:
+- subagent_type: "explore"
 - description: "Cold-read design brief"
-- run_in_background: false
 - prompt: |
     Read .design-foundations/research/<file>.md. You have no other context about
-    it, and the next reader won't either — it feeds /design-for-ai:plan in a
+    it, and the next reader won't either — it feeds /design-plan in a
     fresh session. Report, as a short severity-ranked list (or "clean"):
     - Questions you'd have to ask before you could plan from this doc
     - Mood or feel words a designer couldn't act on — would two designers
@@ -182,7 +182,7 @@ Fold trivial findings into the doc directly; take substantive ones back to the u
 When the brief is confirmed, hand off to plan:
 
 ```
-/design-for-ai:plan .design-foundations/research/<file>.md
+/design-plan .design-foundations/research/<file>.md
 ```
 
 The plan command reads this doc as its seed — it doesn't re-derive intent, it decomposes it into phases.

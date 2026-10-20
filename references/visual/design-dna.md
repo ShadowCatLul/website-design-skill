@@ -51,7 +51,7 @@ Generation without references samples the model's prior — the interview and ar
 
 > **X's [specific quality] + Y's [specific quality]** — e.g. "Linear's typography discipline + Pitchfork's editorial color."
 
-Why two: one reference is a clone target; two pull in different directions, and the direction satisfying both is somewhere the training data has no cluster. Triangulation off the statistical center is the one Claude-specific mitigation the 2026 divergence research surfaced — and it matches designer practice, where reference/mood-board gathering is a distinct step before any sketching.
+Why two: one reference is a clone target; two pull in different directions, and the direction satisfying both is somewhere the training data has no cluster. Triangulation off the statistical center is the one model-specific mitigation the 2026 divergence research surfaced — and it matches designer practice, where reference/mood-board gathering is a distinct step before any sketching.
 
 What counts as a reference: a product, a publication, a movement, a physical object (a transit map, a receipt, a paperback cover, a road sign). What doesn't: a distribution — "modern SaaS" or "clean minimal" names the center, not a point. Name the *specific quality* being borrowed from each, not the whole aesthetic; the collision of the two qualities is what defines the candidate's direction.
 

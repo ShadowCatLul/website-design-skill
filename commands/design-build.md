@@ -48,7 +48,7 @@ git worktree list
 | On `main`/`master`, clean | Ask the user (below) before proceeding |
 | Dirty working tree | Ask the user (below) before proceeding |
 
-**On main/master or a dirty tree, resolve via `AskUserQuestion`** — both are decisive picks with 2-3 self-contained options, so the dialog is the right channel (unlike the content-review checkpoints in `commands/plan.md`, there's nothing here the user needs to read first):
+**On main/master or a dirty tree, resolve via the `question` tool** — both are decisive picks with 2-3 self-contained options, so the dialog is the right channel (unlike the content-review checkpoints in `commands/design-plan.md`, there's nothing here the user needs to read first):
 
 ```
 You're on [main]. Building a design plan requires an isolated workspace.
@@ -68,21 +68,21 @@ Stash, commit, or abort?
 - [ ] Abort
 ```
 
-- **Worktree:** `git worktree add .claude/worktrees/<plan-slug> -b feature/<plan-slug>`, copy the plan file in, `cd` into it. Run dependency setup only if the project has a lockfile (a design-doc plan usually does not).
+- **Worktree:** `git worktree add .opencode/worktrees/<plan-slug> -b feature/<plan-slug>`, copy the plan file in, `cd` into it. Run dependency setup only if the project has a lockfile (a design-doc plan usually does not).
 - **Feature branch:** `git checkout -b feature/<plan-topic>`.
 
 Record the workspace mode (worktree path + branch, or branch) for the REPORT merge instructions. **Never proceed on main/master** — a multi-phase build committed there has no rollback boundary, and a failed phase leaves the default branch broken.
 
 ### Locate + Parse the Plan
 
-Read the plan path from `$ARGUMENTS` (or `.design-foundations/plans/`). If none given, `ls .design-foundations/plans/*.md` and ask which to execute. Extract:
+Read the plan path from `$ARGUMENTS` (or `.design-foundations/plans/`). If none given, `dir .design-foundations\plans\*.md` and ask which to execute. Extract:
 
 1. **Context** — used for goal anchoring in BUILD dispatch prompts (NOT for REVIEW).
 2. **Phases** — the lifecycle stages (Discover / Design).
 3. **Done-when items per phase** — every `- [ ]` under each `**Done when:**` (passed verbatim to both agents).
 4. **`**Doctrine:**` per phase** — the doctrine names; become the `## Doctrine` block in each agent dispatch.
 5. **`**Gate:**` per phase** — Full / Standard / Minimal.
-6. **`**Model:**` per phase** — optional override (ladder: fable/sonnet/haiku; `opus` valid only as an explicit override).
+6. **`**Model:**` per phase** — optional explicit override (any model from the opencode config; omit → the active model, Qwen3.8-27B). Legacy tier names in old plans (fable/sonnet/haiku/opus) are not errors — treat them as "active model".
 7. **Edge cases per phase** — passed to REVIEW with DW-item verdict standing.
 
 ### Verify Plan is Ready
@@ -103,22 +103,15 @@ Set in the plan file: `**Status:** in-progress`, `**Started:** YYYY-MM-DD HH:MM`
 
 ### Doctrine Resolution
 
-For each phase, read its `**Doctrine:**` field. Validate each name against the resolver in `docs/pillar-taxonomy.md §5`. A name absent from the resolver → STOP and surface the gap to the user. A missing field → match the phase goal/scope against the stage map in `commands/plan.md` and add the right doctrine names. These become the `## Doctrine` block in each agent dispatch.
+For each phase, read its `**Doctrine:**` field. Validate each name against the resolver in `docs/pillar-taxonomy.md §5`. A name absent from the resolver → STOP and surface the gap to the user. A missing field → match the phase goal/scope against the stage map in `commands/design-plan.md` and add the right doctrine names. These become the `## Doctrine` block in each agent dispatch.
 
 ### Model Resolution
 
-Use the phase's `**Model:**` field if present, else omit (agents run on the active model). The ladder is fable → sonnet → haiku (`opus` a valid override, resolved the same as fable — a legacy plan naming `opus` is not an error). If a model is set, downgrade REVIEW one tier (prover-verifier asymmetry — intentional):
-
-| BUILD model | REVIEW model |
-|-------------|--------------|
-| fable | sonnet |
-| opus | sonnet |
-| sonnet | haiku |
-| haiku | haiku (floor) |
+Use the phase's `**Model:**` field if present, else omit — the agents run on the active model (**Qwen3.8-27B**). REVIEW runs on the same model as BUILD: with a single model there is no tier to downgrade to, and review honesty comes from the dual-blind isolation (no intent-framing + the deterministic detector), not from a different reviewer. A legacy plan naming a tier (fable/sonnet/haiku/opus) is not an error — treat it as "active model".
 
 ### Effort
 
-Dispatched BUILD/REVIEW agents run at **default** effort — the plan already carries the strategic reasoning from planning's high-effort pass (`commands/plan.md`); orchestration here is dispatch work, and the subagents think in their own contexts regardless of the orchestrator's setting.
+Dispatched BUILD/REVIEW agents run at **default** effort — the plan already carries the strategic reasoning from planning's high-effort pass (`commands/design-plan.md`); orchestration here is dispatch work, and the subagents think in their own contexts regardless of the orchestrator's setting.
 
 ### Gate Resolution
 
@@ -173,9 +166,8 @@ Execute tasks in order. For each: verify blockedBy is empty → mark in_progress
 Dispatch the build-agent. For **Full / Standard**, include discovery; for **Minimal**, say "minimal gate" (the agent's Mode Detection skips discovery).
 
 ```
-Agent tool:
+Task tool:
 - subagent_type: "design-build-agent"
-- model: [phase's **Model:**, or omit]
 - description: "BUILD Phase N"
 - prompt: |
     Build Phase N of the design plan. [Full/Standard: "Two parts —
@@ -227,9 +219,8 @@ Verify the BUILD task is complete. Then dispatch the review-agent.
 **Debiasing rule (do not violate).** Give the reviewer **NO intent-framing** — do NOT include the plan's Context, any Progress block, the discovery file, or any account of what the build-agent did or intended. Requirements + the rendered artifact + edge cases only.
 
 ```
-Agent tool:
+Task tool:
 - subagent_type: "design-review-agent"
-- model: [resolved REVIEW model — BUILD model downgraded one tier; omit if no **Model:**]
 - description: "REVIEW Phase N"
 - prompt: |
     Independently critique the rendered design surface below against the

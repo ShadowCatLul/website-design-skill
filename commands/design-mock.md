@@ -18,13 +18,13 @@ This command obeys the shared contract in `docs/workflow-conventions.md` (the li
 `$ARGUMENTS` is the **plan path** (e.g. `.design-foundations/plans/2026-06-20-acme.md`).
 
 - **Path to an existing plan:** `Read` it. You need its Context (for your own framing), the design direction, and the page(s) to mock.
-- **No path given:** `ls .design-foundations/plans/*.md` and ask "Which plan should I mock?"
+- **No path given:** `dir .design-foundations\plans\*.md` and ask "Which plan should I mock?"
 - **Path does not exist:** say so and ask for the right path.
 
 Then scan the design state — this sets the mock fidelity:
 
 ```
-ls DESIGN.md JOURNEY.md 2>/dev/null
+dir DESIGN.md JOURNEY.md 2>nul
 ```
 
 | Artifacts present | Mock fidelity | Flag to surface |
@@ -43,7 +43,7 @@ ls DESIGN.md JOURNEY.md 2>/dev/null
 Dispatch `design-build-agent` in **minimal-gate** mode (cheap — no discovery pass) to render the mock. The agent routes the mock through the **`prototype`** skill (its Render evidence path) — that is how `mock` consumes the prototype skill without inlining it.
 
 ```
-Agent tool:
+Task tool:
 - subagent_type: "design-build-agent"
 - description: "MOCK — render checkpoint prototype"
 - prompt: |
@@ -89,7 +89,7 @@ Dispatch ONE `design-review-agent` for a cheap validation on the rendered pixels
 **Debiasing rule (do not violate).** The reviewer gets **requirements + the rendered artifact ONLY** — NO plan Context, NO "this is our direction," NO account of how the mock was made. Conclusion framing collapses defect detection (the agent enforces this too, but the dispatch must not break it).
 
 ```
-Agent tool:
+Task tool:
 - subagent_type: "design-review-agent"
 - description: "MOCK validation — cross-pillar critique on pixels"
 - prompt: |
@@ -139,7 +139,7 @@ This is the evidence the user signs off (or rejects) the direction on.
 
 ## Sign-off Gate
 
-`mock` does NOT auto-advance to `build` — the direction commits real build cost, so only the user can decide whether it's right. Present the evidence, then ask the user to decide, and wait for an explicit answer: this is a genuine three-option decision on evidence already shown in conversation (Step 3), which is exactly what `AskUserQuestion` is for.
+`mock` does NOT auto-advance to `build` — the direction commits real build cost, so only the user can decide whether it's right. Present the evidence, then ask the user to decide, and wait for an explicit answer: this is a genuine three-option decision on evidence already shown in conversation (Step 3), which is exactly what the `question` tool is for.
 
 Ask:
 
@@ -153,9 +153,9 @@ Direction check — does this mock prove the right design direction?
 
 | User decision | Action |
 |---|---|
-| **Approve** | Chain to build: `/design-for-ai:build [plan path]`. State: "Direction approved — running the gated build." |
+| **Approve** | Chain to build: `/design-build [plan path]`. State: "Direction approved — running the gated build." |
 | **Swap an axis** | Ask which axis: hue, chroma, font, or signature — never composition or family (wanting a different composition cell is a re-deal, a plan-loop matter, not a swap). Edit DESIGN.md first: for hue/chroma, re-run `scripts/palette.mjs` and paste the fresh tokens + contrast report; for font/signature, update the token entries directly. Update the **Pins:** line either way. Re-confirm the lock, re-render the mock once via Steps 1-2, and re-present at this same gate. |
-| **Adjust / reject** | Loop back: `/design-for-ai:plan [plan path]`, carrying the review findings (especially Critical/Major) so the next pass addresses them. State: "Direction not yet right — looping to plan/Design with the findings; not proceeding to build." |
+| **Adjust / reject** | Loop back: `/design-plan [plan path]`, carrying the review findings (especially Critical/Major) so the next pass addresses them. State: "Direction not yet right — looping to plan/Design with the findings; not proceeding to build." |
 
 One swap loop only. If the re-rendered mock still isn't right, the axis wasn't the problem — the direction is; route to Adjust on the next pass instead of swapping again.
 

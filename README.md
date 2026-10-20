@@ -1,8 +1,8 @@
 # design-for-ai
 
-Claude builds interfaces that look like Claude built them. Cyan-on-dark hero sections. Cards in a grid, all the same size. Glassmorphism on everything. Bounce easing. Inter at 16px. You've seen it. You've shipped it. Your users noticed.
+AI models build interfaces that look like AI built them. Cyan-on-dark hero sections. Cards in a grid, all the same size. Glassmorphism on everything. Bounce easing. Inter at 16px. You've seen it. You've shipped it. Your users noticed.
 
-This plugin teaches Claude the design vocabulary it's missing. Not "make it pretty" — the actual frameworks working designers use: proportional systems that make element sizing feel right instead of arbitrary, type scales built from ratios instead of guessing, color palettes constructed from the color wheel instead of vibes, composition rules that create a visual anchor instead of uniform mush.
+This plugin teaches your model the design vocabulary it's missing — retargeted for **Qwen3.8-27B on opencode**. Not "make it pretty" — the actual frameworks working designers use: proportional systems that make element sizing feel right instead of arbitrary, type scales built from ratios instead of guessing, color palettes constructed from the color wheel instead of vibes, composition rules that create a visual anchor instead of uniform mush.
 
 Based on *Design for Hackers* by David Kadavy. Nine chapters of design theory, distilled into reference files that Claude loads on demand.
 
@@ -50,7 +50,7 @@ The composition dealer exists to stop the *model* from choosing — model choice
 
 ## What changes
 
-Without this plugin, Claude picks safe defaults. With it, Claude can explain *why* Garamond breaks on screen (angled axis, 100 ppi, moire), *why* your layout has no focal point (no dominant element, so the eye has nowhere to land), *why* your shadows look flat (pure black overlay instead of hue-shifted darker tones).
+Without this plugin, the model picks safe defaults. With it, the model can explain *why* Garamond breaks on screen (angled axis, 100 ppi, moire), *why* your layout has no focal point (no dominant element, so the eye has nowhere to land), *why* your shadows look flat (pure black overlay instead of hue-shifted darker tones).
 
 The difference: every design decision traces back to a principle. Not taste. Not "it looks better." A specific, citable reason from a specific chapter.
 
@@ -64,16 +64,25 @@ LLMs sample the statistical center of their training data. That's why every AI s
 - **Real palettes, not invented hexes.** A bundled OKLCH generator (`scripts/palette.mjs`) builds 12-step neutral and accent ramps with WCAG contrast solved by construction: light and dark, harmony-derived secondary accents, functional colors.
 - **A signature move.** Every DNA includes one specific decision a template would never contain.
 
-## Install
+## Install (opencode)
 
-```bash
-/plugin marketplace add ryanthedev/rtd-claude-inn
-/plugin install design-for-ai@rtd
+Clone this repo, then in your `opencode.jsonc`:
+
+```jsonc
+{
+  "skills": { "paths": ["<repo>/skills"] }
+}
 ```
 
-Update: `/plugin update design-for-ai@rtd`
+Copy `agents/*.md` to `~/.config/opencode/agents/` and `commands/*.md` to `~/.config/opencode/commands/`. If the repo lives outside the project root, prepend each command/agent file with a one-line plugin-root header (the absolute path to the repo) so relative `references/`, `scripts/`, `docs/` paths resolve.
 
-The current version is **4.2.0** — the `research → plan → mock → build` workflow on a deterministic doctrine-read model, with user-pinnable DNA axes and a verified-brief research pass. The install path is unchanged: the four workflow commands, two agents, and four skills (`prototype`, `clarify`, `usability`, `data-viz`) are auto-discovered from the plugin's `commands/`, `agents/`, and `skills/` directories.
+Target model: **Qwen3.8-27B** as the single active model — all phases and reviews run on it (any capable model works; the prompts reference "the active model", never a tier name).
+
+The current version is **4.2.0-qwen** — the `research → plan → mock → build` workflow on a deterministic doctrine-read model, with user-pinnable DNA axes and a verified-brief research pass, repackaged from the original Claude Code plugin for opencode: `/design-research`, `/design-plan`, `/design-mock`, `/design-build` commands, two Task-tool subagents, and four skills (`prototype`, `clarify`, `usability`, `data-viz`).
+
+### Claude Code (original)
+
+The original Claude Code plugin format is still available upstream (`.claude-plugin/plugin.json` is kept in this repo for compatibility).
 
 ## License
 

@@ -30,7 +30,7 @@ Doctrine reference files in `references/` are plain Markdown — skip this check
 - [ ] **Source.** Read the backing grug research for this skill's domain (named in the taxonomy row).
       Pull the principles/laws/patterns the skill will cite. Cite-the-principle on every claim.
 - [ ] **Baseline evals.** Author ≥3 evals (`evals.json`); run `run_eval` with
-      `configurations: ["without_skill"]` to document what Claude misses without the skill.
+      `configurations: ["without_skill"]` to document what the model misses without the skill.
 - [ ] **Stub the surface.** Create `skills/<name>/SKILL.md` with frontmatter (§2) + the body
       skeleton (§3), and empty `references/<file>.md` stubs (§4). Wire routing in SKILL.md only.
 - [ ] **Author.** Fill the body and references from the research. SKILL.md body < 500 lines;

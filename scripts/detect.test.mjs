@@ -280,7 +280,7 @@ test("DW-6.2 rubric contains a distinctiveness criterion — on-pattern safety c
 });
 
 test("DW-6.4 mock.md and build.md review dispatches invoke both assessments", () => {
-  for (const file of ["commands/mock.md", "commands/build.md"]) {
+  for (const file of ["commands/design-mock.md", "commands/design-build.md"]) {
     const doc = readFileSync(join(ROOT, file), "utf8");
     assert(/run BOTH assessments/i.test(doc), `${file}: dispatch must require both assessments`);
     assert(/Assessment A/.test(doc) && /Assessment B/.test(doc), `${file}: dispatch must name A and B`);
